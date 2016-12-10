@@ -72,14 +72,6 @@ func loadPage(filename string) (*Page, error) {
 }
 
 /**
-* @brief Outputs something empty to the client to avoid them understanding invalid requests as errors
-*/
-func renderEmpty(w http.ResponseWriter) {
-    //fmt.Println("render empty")
-    fmt.Fprintf(w, "")
-}
-
-/**
 * @brief Handles a single HTTP request to any non-defined request. Only index is served
 * @param w: Object that writes the response to the requesting client
 * @param r: The details about the request that was made to this server
@@ -93,7 +85,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
     path := r.URL.Path[1:]
     //fmt.Println("main handler ", path)
     if len(path) > 0 {
-        renderEmpty(w)
+        displayError(errors.New("File not found"), w, path)
         return
     }
 
@@ -206,7 +198,15 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
 */
 func genericFileHandler(w http.ResponseWriter, r *http.Request) {
     path := r.URL.Path[1:]
+
     //fmt.Println("serving ", path)
+
+    // For now limit requested files to only the stylesheet
+    if path != "web.css" && path != "./web.css" && path != "../web.css" {
+        displayError(errors.New("File not found"), w, path)
+        return;
+    }
+
     f, err := ioutil.ReadFile(path)
     if err != nil {
         displayError(err, w, path)

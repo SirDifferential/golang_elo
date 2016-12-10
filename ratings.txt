@@ -9,3 +9,6 @@ xaionaro:1800
 ziper:1700
 shiver:2000
 onpon:1598
+elvish_pillager:2000
+tiberian:2000
+sideways:1850
