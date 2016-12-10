@@ -19,12 +19,11 @@ type PlayerRating struct {
 type HistoryEntry struct {
   Player1 string
   Player2 string
-  Result string
   OldRating_p1 int
   OldRating_p2 int
   NewRating_p1 int
   NewRating_p2 int
-  ExpectedResult float64
+  Expected float64
   EpochTime int64
 }
 
@@ -60,7 +59,7 @@ func GetHistory() ([]HistoryEntry, error) {
             }
         }
 
-        if delims_found != 8 {
+        if delims_found != 7 {
             fmt.Println("invalid entry: ", line)
             continue
         }
@@ -69,44 +68,43 @@ func GetHistory() ([]HistoryEntry, error) {
 
         player1 := stringSlice[0]
         player2 := stringSlice[1]
-        result := stringSlice[2]
 
-        old_r1, err := strconv.Atoi(stringSlice[3])
+        old_r1, err := strconv.Atoi(stringSlice[2])
         if err != nil {
             fmt.Println("failed converting ", old_r1, " to int")
             continue
         }
-        old_r2, err := strconv.Atoi(stringSlice[4])
+        old_r2, err := strconv.Atoi(stringSlice[3])
         if err != nil {
             fmt.Println("failed converting ", old_r2, " to int")
             continue
         }
 
-        new_r1, err := strconv.Atoi(stringSlice[5])
+        new_r1, err := strconv.Atoi(stringSlice[4])
         if err != nil {
             fmt.Println("failed converting ", new_r1, " to int")
             continue
         }
 
-        new_r2, err := strconv.Atoi(stringSlice[6])
+        new_r2, err := strconv.Atoi(stringSlice[5])
         if err != nil {
             fmt.Println("failed converting ", new_r2, " to int")
             continue
         }
 
-        expected, err := strconv.ParseFloat(stringSlice[7], 64)
+        expected, err := strconv.ParseFloat(stringSlice[6], 64)
         if err != nil {
             fmt.Println("failed converting ", expected, " to float")
             continue
         }
 
-        epoch, err := strconv.ParseInt(stringSlice[8], 10, 64)
+        epoch, err := strconv.ParseInt(stringSlice[7], 10, 64)
         if err != nil {
             fmt.Println("failed converting ", epoch, " to int")
             continue
         }
 
-        history = append(history, HistoryEntry{Player1: player1, Player2: player2, Result: result, OldRating_p1: old_r1, OldRating_p2: old_r2, NewRating_p1: new_r1, NewRating_p2: new_r2, ExpectedResult: expected, EpochTime: epoch})
+        history = append(history, HistoryEntry{Player1: player1, Player2: player2, OldRating_p1: old_r1, OldRating_p2: old_r2, NewRating_p1: new_r1, NewRating_p2: new_r2, Expected: expected, EpochTime: epoch})
     }
 
     sort.Sort(sort.Reverse(ByEpoch(history)))

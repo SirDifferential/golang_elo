@@ -13,20 +13,13 @@ import (
 
 func main() {
 
-    if len(os.Args) < 4 {
-        fmt.Println("usage: player1_name player2_name result, where result is either wins, draws or loses")
+    if len(os.Args) < 3 {
+        fmt.Println("usage: player1_name player2_name")
         return
     }
 
     player1 := string(os.Args[1])
     player2 := string(os.Args[2])
-    result := string(os.Args[3])
-
-    //fmt.Println(player1, player2, result)
-    if result != "wins" && result != "loses" && result != "draws" {
-        fmt.Println("result must be either wins, loses or draws")
-        return
-    }
 
     file, err := os.Open("ratings.txt")
     if err != nil {
@@ -84,20 +77,8 @@ func main() {
     expected_p1 := trans_p1 / (trans_p1 + trans_p2)
     expected_p2 := trans_p2 / (trans_p1 + trans_p2)
 
-    s1 := 0.0
+    s1 := 1.0
     s2 := 0.0
-
-    if result == "wins" {
-        s1 = 1.0
-        s2 = 0.0
-    } else if result == "loses" {
-        s1 = 0.5
-        s2 = 0.5
-    } else {
-        s1 = 0.0
-        s2 = 1.0
-    }
-
     k := 32.0
 
     rating1_f := float64(rating1)
@@ -147,8 +128,6 @@ func main() {
     buffer_out_history.WriteString(player1)
     buffer_out_history.WriteString(":")
     buffer_out_history.WriteString(player2)
-    buffer_out_history.WriteString(":")
-    buffer_out_history.WriteString(result)
     buffer_out_history.WriteString(":")
     buffer_out_history.WriteString(strconv.Itoa(rating1))
     buffer_out_history.WriteString(":")

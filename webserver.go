@@ -8,14 +8,16 @@ import (
     "strings"
     "html/template"
     "errors"
+    "strconv"
     "time"
+    "bytes"
     "elolib/eloutils"
 )
 
 type HistoryData struct {
     Player1 string
     Player2 string
-    Result string
+    Expected string
     Change1 int
     Change2 int
     Date string
@@ -114,7 +116,20 @@ func handler(w http.ResponseWriter, r *http.Request) {
         h := history[i]
         time_temp := time.Unix(h.EpochTime, 0)
         time_str := time_temp.Format("2006-01-02 15:04:05")
-        history_data = append(history_data, HistoryData{Player1: h.Player1, Player2: h.Player2, Result: h.Result, Change1: h.NewRating_p1 - h.OldRating_p1, Change2: h.NewRating_p2 - h.OldRating_p2, Date: time_str})
+
+        percentage_str := strconv.FormatFloat(h.Expected, 'f', 2, 64)
+        percentage_strings := strings.Split(percentage_str, ".")
+        if len(percentage_strings) != 2 {
+            displayError(errors.New("Arithmetic error"), w, "index.html")
+            return
+        }
+
+        percentage := percentage_strings[1]
+        var str_buffer bytes.Buffer
+        str_buffer.WriteString(percentage)
+        str_buffer.WriteString(" %")
+
+        history_data = append(history_data, HistoryData{Player1: h.Player1, Player2: h.Player2, Expected: str_buffer.String(), Change1: h.NewRating_p1 - h.OldRating_p1, Change2: h.NewRating_p2 - h.OldRating_p2, Date: time_str})
     }
 
     template_render := TemplateRenderData{Ratings: ratings, History: history_data}
@@ -162,7 +177,20 @@ func playerHandler(w http.ResponseWriter, r *http.Request) {
         }
         time_temp := time.Unix(h.EpochTime, 0)
         time_str := time_temp.Format("2006-01-02 15:04:05")
-        history_data = append(history_data, HistoryData{Player1: h.Player1, Player2: h.Player2, Result: h.Result, Change1: h.NewRating_p1 - h.OldRating_p1, Change2: h.NewRating_p2 - h.OldRating_p2, Date: time_str})
+
+        percentage_str := strconv.FormatFloat(h.Expected, 'f', 2, 64)
+        percentage_strings := strings.Split(percentage_str, ".")
+        if len(percentage_strings) != 2 {
+            displayError(errors.New("Arithmetic error"), w, "index.html")
+            return
+        }
+
+        percentage := percentage_strings[1]
+        var str_buffer bytes.Buffer
+        str_buffer.WriteString(percentage)
+        str_buffer.WriteString(" %")
+
+        history_data = append(history_data, HistoryData{Player1: h.Player1, Player2: h.Player2, Expected: str_buffer.String(), Change1: h.NewRating_p1 - h.OldRating_p1, Change2: h.NewRating_p2 - h.OldRating_p2, Date: time_str})
     }
 
     player := PlayerData{Name: player_name, Rating: 0, Rank: 0}

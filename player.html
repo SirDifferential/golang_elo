@@ -23,20 +23,20 @@
         <table>
         <tr>
             <th>Date</th>
-            <th>P1</th>
-            <th>P2</th>
-            <th>Result</th>
+            <th>Win</th>
+            <th>Lose</th>
             <th>ΔR1</th>
             <th>ΔR2</th>
+            <th>Win probability</th>
         </tr>
             {{ range $key, $value := .History }}
             <tr>
                 <td>{{ $value.Date }}</td>
                 <td>{{ $value.Player1 }}</td>
                 <td>{{ $value.Player2 }}</td>
-                <td>{{ $value.Result }}</td>
                 <td>{{ $value.Change1 }}</td>
                 <td>{{ $value.Change2 }}</td>
+                <td>{{ $value.Expected }}</td>
             </tr>
             {{ end }}
         </table>
