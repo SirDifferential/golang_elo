@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>UQM ELO ratings</title>
+<link rel="StyleSheet" href="../web.css" type="text/css" media="screen">
+</head>
+<body>
+
+<div id="header">
+    <div id="nav">
+        <a href="../">Back</a>
+    </div>
+</div>
+
+<div id="content">
+    <div id="player">
+        <p>Name: {{ .Player.Name }}</p>
+        <p>Rank: {{ .Player.Rank }}</p>
+        <p>ELO: {{ .Player.Rating }}</p>
+    </div>
+
+    <div id="recent">
+        <p>Games played</p>
+        <table>
+        <tr>
+            <th>Date</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>Result</th>
+            <th>ΔR1</th>
+            <th>ΔR2</th>
+        </tr>
+            {{ range $key, $value := .History }}
+            <tr>
+                <td>{{ $value.Date }}</td>
+                <td>{{ $value.Player1 }}</td>
+                <td>{{ $value.Player2 }}</td>
+                <td>{{ $value.Result }}</td>
+                <td>{{ $value.Change1 }}</td>
+                <td>{{ $value.Change2 }}</td>
+            </tr>
+            {{ end }}
+        </table>
+    </div>
+</div>
+
+<div id="footer">
+</div>
+
+</body>
+</html>
+

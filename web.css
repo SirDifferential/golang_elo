@@ -3,9 +3,18 @@
     width: 200px;
 }
 
+#player  {
+    float: left;
+    width: 200px;
+}
+
 #recent {
     float: left;
     width: 700px;
+}
+
+p {
+    font-size: 14px;
 }
 
 body {

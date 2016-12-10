@@ -33,6 +33,11 @@ func (a ByRating) Len() int           { return len(a) }
 func (a ByRating) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByRating) Less(i, j int) bool { return a[i].Rating < a[j].Rating }
 
+type ByEpoch []HistoryEntry
+func (a ByEpoch) Len() int           { return len(a) }
+func (a ByEpoch) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByEpoch) Less(i, j int) bool { return a[i].EpochTime < a[j].EpochTime }
+
 func GetHistory() ([]HistoryEntry, error) {
 
     file, err := os.Open("history.txt")
@@ -103,6 +108,8 @@ func GetHistory() ([]HistoryEntry, error) {
 
         history = append(history, HistoryEntry{Player1: player1, Player2: player2, Result: result, OldRating_p1: old_r1, OldRating_p2: old_r2, NewRating_p1: new_r1, NewRating_p2: new_r2, ExpectedResult: expected, EpochTime: epoch})
     }
+
+    sort.Sort(sort.Reverse(ByEpoch(history)))
 
     return history, nil
 }

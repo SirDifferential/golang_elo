@@ -7,6 +7,7 @@ import (
     "io/ioutil"
     "strings"
     "html/template"
+    "errors"
     "time"
     "elolib/eloutils"
 )
@@ -20,9 +21,16 @@ type HistoryData struct {
     Date string
 }
 
+type PlayerData struct {
+    Name string
+    Rank int
+    Rating int
+}
+
 type TemplateRenderData struct {
     Ratings []elolib.PlayerRating
     History []HistoryData
+    Player PlayerData
 }
 
 type Page struct {
@@ -67,7 +75,7 @@ func loadPage(filename string) (*Page, error) {
 * @brief Outputs something empty to the client to avoid them understanding invalid requests as errors
 */
 func renderEmpty(w http.ResponseWriter) {
-    fmt.Println("render empty")
+    //fmt.Println("render empty")
     fmt.Fprintf(w, "")
 }
 
@@ -83,7 +91,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // if it was a request we should process
 
     path := r.URL.Path[1:]
-    fmt.Println("main handler ", path)
+    //fmt.Println("main handler ", path)
     if len(path) > 0 {
         renderEmpty(w)
         return
@@ -127,17 +135,70 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 /**
-* @brief Serves requests to URLs beginning with /view/
+* @brief Serves requests to URLs beginning with /player/
 */
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-    title := r.URL.Path[len("/view/"):]
-    fmt.Println("serving view ", title)
-    p, err := loadPage(title)
-    if err != nil {
-        displayError(err, w, title)
+func playerHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[len("/player/"):]
+    player_name := title
+
+    for i := range player_name {
+        if player_name[i] == '/' || player_name[i] == '.' {
+            displayError(errors.New("Invalid character in player name"), w, "player")
+            return
+        }
+    }
+
+    //fmt.Println("serving player ", player_name)
+    ratings, err := elolib.GetRatings()
+
+    if ratings == nil || err != nil {
+        displayError(err, w, "player")
         return
     }
-    fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+
+    history, err := elolib.GetHistory()
+    if err != nil {
+        displayError(err, w, "player")
+        return
+    }
+
+    history_data := make([]HistoryData, 0)
+    for i := range history {
+        h := history[i]
+        if h.Player1 != player_name && h.Player2 != player_name {
+            continue
+        }
+        time_temp := time.Unix(h.EpochTime, 0)
+        time_str := time_temp.Format("2006-01-02 15:04:05")
+        history_data = append(history_data, HistoryData{Player1: h.Player1, Player2: h.Player2, Result: h.Result, Change1: h.NewRating_p1 - h.OldRating_p1, Change2: h.NewRating_p2 - h.OldRating_p2, Date: time_str})
+    }
+
+    player := PlayerData{Name: player_name, Rating: 0, Rank: 0}
+
+    found_player := false
+    for i := range ratings {
+        if ratings[i].Player == player_name {
+            found_player = true
+
+            player.Rating = ratings[i].Rating
+            player.Rank = ratings[i].Rank
+            player.Name = ratings[i].Player
+            break
+        }
+    }
+
+    if found_player == false {
+        displayError(errors.New("Player not found"), w, "player")
+        return
+    }
+
+    template_render := TemplateRenderData{Ratings: ratings, History: history_data, Player: player}
+    t, _ := template.ParseFiles("player.html")
+    err = t.Execute(w, template_render)
+
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 /**
@@ -145,7 +206,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 */
 func genericFileHandler(w http.ResponseWriter, r *http.Request) {
     path := r.URL.Path[1:]
-    fmt.Println("serving ", path)
+    //fmt.Println("serving ", path)
     f, err := ioutil.ReadFile(path)
     if err != nil {
         displayError(err, w, path)
@@ -159,8 +220,8 @@ func main() {
     // Handler for any URL not specified explicitly
     http.HandleFunc("/", handler)
 
-    // Handler for the path "/view/", listing ELO scores
-    http.HandleFunc("/view/", viewHandler)
+    // Handler for the path "/player/", listing player history
+    http.HandleFunc("/player/", playerHandler)
 
     // Serves the stylesheet
     http.HandleFunc("/web.css", genericFileHandler)

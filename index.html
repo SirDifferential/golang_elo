@@ -11,6 +11,7 @@
 
 <div id="content">
     <div id="ratings">
+        <p>Ranking</p>
         <table>
             <tr>
                 <th>Position</th>
@@ -19,13 +20,15 @@
             {{ range $key, $value := .Ratings }}
             <tr>
                 <td>{{ $value.Rank }}</td>
-                <td>{{ $value.Player }}</td>
+                <td><a href="/player/{{ $value.Player }}">{{ $value.Player }}</a></td>
                 <td>{{ $value.Rating }}</td>
             </tr>
             {{ end }}
         </table>
     </div>
+
     <div id="recent">
+        <p>Recent games</p>
         <table>
         <tr>
             <th>Date</th>
@@ -38,8 +41,8 @@
             {{ range $key, $value := .History }}
             <tr>
                 <td>{{ $value.Date }}</td>
-                <td>{{ $value.Player1 }}</td>
-                <td>{{ $value.Player2 }}</td>
+                <td><a href="/player/{{ $value.Player1}}">{{ $value.Player1 }}</a></td>
+                <td><a href="/player/{{ $value.Player2}}">{{ $value.Player2 }}</a></td>
                 <td>{{ $value.Result }}</td>
                 <td>{{ $value.Change1 }}</td>
                 <td>{{ $value.Change2 }}</td>
