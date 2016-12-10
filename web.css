@@ -1,0 +1,28 @@
+#ratings {
+    float: left;
+    width: 200px;
+}
+
+#recent {
+    float: left;
+    width: 700px;
+}
+
+body {
+    font-family: "Tahoma";
+}
+table {
+    border-collapse: collapse;
+    font-size: 0.8em;
+}
+th, td {
+    padding: 4px;
+    font-family: "Tahoma";
+}
+th {
+    background-color: #369;
+    color: #eee;
+    text-align: center;
+    font-weight: bold;
+}
+
